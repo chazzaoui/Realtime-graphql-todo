@@ -22,6 +22,7 @@ query ($isPublic: Boolean) {
       created_at: desc
     },
     where: { is_public: { _eq: $isPublic} }
+    limit:10
   ) {
     id
     title
