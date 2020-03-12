@@ -4,6 +4,22 @@ import Drawer from './DrawerNavigator';
 import CenterSpinner from '../screens/components/Util/CenterSpinner';
 import { ApolloProvider } from 'react-apollo';
 import makeApolloClient from '../apollo';
+import gql from "graphql-tag";
+
+// GraphQL mutation to update last_seen
+const EMIT_ONLINE_EVENT = gql`
+mutation {
+  update_users(
+    _set: {
+      last_seen: "now()"
+    },
+    where: {}
+  ) {
+    affected_rows
+  }
+}
+`;
+
 const Main = () => {
   const [client, setClient] = React.useState(null);
   const fetchSession = async () => {
@@ -13,6 +29,16 @@ const Main = () => {
     const { token, id } = sessionObj;
     const client = makeApolloClient(token);
     setClient(client);
+
+    setInterval(
+      () => client.mutate({
+        mutation: EMIT_ONLINE_EVENT,
+        variables: {
+          userId: id
+        }
+     }),
+      30000
+    );
   }
   React.useEffect(() => {
     fetchSession();

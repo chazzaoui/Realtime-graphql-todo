@@ -8,26 +8,28 @@ import {
 } from 'react-native';
 import CenterSpinner from './components/Util/CenterSpinner';
 import MenuButton from './components/Util/MenuButton';
+import {useSubscription} from '@apollo/react-hooks';
+import gql from 'graphql-tag';
 
+
+const SUBSCRIBE_TO_ONLINE_USERS = gql`
+subscription {
+  online_users(order_by: {user: {name: asc}}) {
+    user {
+      name
+      id
+    }
+    id
+  }
+}
+`; 
 
 const OnlineUsers = () => {
-  const data = {
-    "online_users": [
-      {
-        user: {
-          name: "User 1",
-          id: 1
-        },
-        id: 1
-      },
-      {
-        user: {
-          name: "User   2",
-          id: 2
-        },
-        id: 2
-      },
-    ]
+ 
+  const { data, error, loading } = useSubscription(SUBSCRIBE_TO_ONLINE_USERS)
+  if (loading) { return <CenterSpinner />}
+  if (error) {
+    return <Text> Error </Text>
   }
   return (
     <View style={styles.container}>
